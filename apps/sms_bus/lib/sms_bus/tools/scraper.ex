@@ -14,10 +14,10 @@ defmodule SmsBus.Tools.Scraper do
      'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.106 Safari/537.36'}
   ]
 
-  @callback get_next_arrivals_by(route_id :: binary()) :: {:ok, binary()} | {:error, binary()}
-  def get_next_arrivals_by(route_id) do
+  @callback get_next_arrivals_by(stop_id :: binary()) :: {:ok, binary()} | {:error, binary()}
+  def get_next_arrivals_by(stop_id) do
     get_cookie()
-    |> get_next_arrivals(route_id)
+    |> get_next_arrivals(stop_id)
   end
 
   @retry with: exponential_backoff(@exponential_backoff) |> expiry(@expiry)
@@ -32,7 +32,7 @@ defmodule SmsBus.Tools.Scraper do
   end
 
   @retry with: exponential_backoff(@exponential_backoff) |> expiry(@expiry)
-  defp get_next_arrivals(cookie, route_id) do
+  defp get_next_arrivals(cookie, stop_id) do
     req_body =
       %{
         "d" => "busquedaParadero",
@@ -40,7 +40,7 @@ defmodule SmsBus.Tools.Scraper do
         "servicio" => -1,
         "destino" => -1,
         "paradero" => -1,
-        "ingresar_paradero" => route_id,
+        "ingresar_paradero" => stop_id,
         "busqueda_rapida" => "PC616 C08"
       }
       |> URI.encode_query()
