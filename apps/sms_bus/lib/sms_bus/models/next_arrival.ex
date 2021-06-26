@@ -1,4 +1,4 @@
-defmodule SmsBus.Models.NextArrivals do
+defmodule SmsBus.Models.NextArrival do
   defstruct number_plate: "",
             arrival_time: "",
             distance: ""

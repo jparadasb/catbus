@@ -27,7 +27,8 @@ defmodule SmsBus.Tools.Scraper do
          {{"Set-Cookie", cookie}, _headers} <- List.keytake(headers, "Set-Cookie", 0) do
       cookie
     else
-      err -> err
+      {:error, %HTTPoison.Error{reason: reason}} -> {:error, reason}
+      err -> {:error, inspect(err)}
     end
   end
 
@@ -57,7 +58,8 @@ defmodule SmsBus.Tools.Scraper do
            timeout: @timeout
          ) do
       {:ok, %HTTPoison.Response{status_code: 200, body: body}} -> {:ok, body}
-      err -> err
+      {:error, %HTTPoison.Error{reason: reason}} -> {:error, reason}
+      err -> {:error, inspect(err)}
     end
   end
 end
