@@ -1,5 +1,5 @@
 defmodule SmsBusTest do
-  alias SmsBus.Models.{NextArrival, Route, OutInformation}
+  alias SmsBus.Models.{NextArrival, Route}
   use ExUnit.Case
   import Mox
   doctest SmsBus
@@ -15,6 +15,7 @@ defmodule SmsBusTest do
     assert SmsBus.next_arrivals_by_stop_id("PC616") ==
              [
                %Route{
+                 error_message: "",
                  service_number: "406C",
                  next_arrivals: [
                    %NextArrival{
@@ -30,6 +31,7 @@ defmodule SmsBusTest do
                  ]
                },
                %Route{
+                 error_message: "",
                  service_number: "409",
                  next_arrivals: [
                    %NextArrival{
@@ -45,6 +47,7 @@ defmodule SmsBusTest do
                  ]
                },
                %Route{
+                 error_message: "",
                  service_number: "502",
                  next_arrivals: [
                    %NextArrival{
@@ -55,6 +58,7 @@ defmodule SmsBusTest do
                  ]
                },
                %Route{
+                 error_message: "",
                  service_number: "C01",
                  next_arrivals: [
                    %NextArrival{
@@ -70,10 +74,12 @@ defmodule SmsBusTest do
                  ]
                },
                %Route{
+                 error_message: "Fuera de horario de operacion para este paradero",
                  service_number: "C01C",
-                 next_arrivals: [%OutInformation{}]
+                 next_arrivals: []
                },
                %Route{
+                 error_message: "",
                  service_number: "C05",
                  next_arrivals: [
                    %NextArrival{
@@ -84,6 +90,7 @@ defmodule SmsBusTest do
                  ]
                },
                %Route{
+                 error_message: "",
                  service_number: "C08",
                  next_arrivals: [
                    %NextArrival{
@@ -99,12 +106,12 @@ defmodule SmsBusTest do
                  ]
                },
                %Route{
+                 error_message: "Frecuencia estimada es 1 bus cada 15 min.",
                  service_number: "C12",
-                 next_arrivals: [
-                   %OutInformation{message: "Frecuencia estimada es 1 bus cada 15 min."}
-                 ]
+                 next_arrivals: []
                },
                %Route{
+                 error_message: "",
                  service_number: "C16",
                  next_arrivals: [
                    %NextArrival{
@@ -115,5 +122,6 @@ defmodule SmsBusTest do
                  ]
                }
              ]
+             |> Enum.sort_by(&{byte_size(&1.service_number), String.first(&1.service_number)})
   end
 end

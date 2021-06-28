@@ -1,20 +1,56 @@
 defmodule SmsBus.Tools.Parser do
   alias SmsBus.Models.{Route, NextArrival}
 
-  @callback to_struct(html :: binary() | {:ok, binary()} | {:error, binary()}) :: [Map.t()]
+  @callback to_struct(html :: binary() | {:ok, binary()} | {:error, binary()}) :: [Route.t()]
 
   def to_struct({:ok, html}) do
     to_struct(html)
   end
 
+  def to_struct({:error, _}) do
+    []
+  end
+
   def to_struct(html) do
     with {:ok, document} <- Floki.parse_document(html),
-         next_arrivals <-
-           Floki.find(document, "div#siguiente_respuesta, div#proximo_solo_paradero") do
+         arrivals_nodes <-
+           find_node(document, "div#siguiente_respuesta, div#proximo_solo_paradero"),
+         next_arrivals <- get_arrivals_from_nodes(arrivals_nodes),
+         error_routes <- get_routes_with_errors_from_nodes(document) do
       next_arrivals
-      |> group_by_route_id()
-      |> build_route()
+      |> Enum.concat(error_routes)
+      |> Enum.sort_by(&{byte_size(&1.service_number), String.first(&1.service_number)})
     end
+  end
+
+  defp get_routes_with_errors_from_nodes(node) do
+    find_node(node, "div#servicio_error_solo_paradero, div#respuesta_error_solo_paradero")
+    |> get_and_match
+  end
+
+  defp get_and_match([route_node | [message | tail]]) when length(tail) > 1 do
+    [
+      %Route{
+        service_number: get_text(route_node),
+        error_message: get_text(message)
+      }
+      | get_and_match(tail)
+    ]
+  end
+
+  defp get_and_match([route_node | [message | _]]) do
+    [
+      %Route{
+        service_number: get_text(route_node),
+        error_message: get_text(message)
+      }
+    ]
+  end
+
+  defp get_arrivals_from_nodes(arrivals_nodes) do
+    arrivals_nodes
+    |> group_by_route_id()
+    |> build_route()
   end
 
   defp build_route(arrivals_grouped) do
@@ -45,7 +81,15 @@ defmodule SmsBus.Tools.Parser do
     end)
   end
 
+  defp find_node(node, selector) do
+    Floki.find(node, selector)
+  end
+
   defp get_text(node, selector) do
-    Floki.find(node, selector) |> Floki.text() |> String.trim()
+    Floki.find(node, selector) |> get_text()
+  end
+
+  defp get_text(node) do
+    node |> Floki.text() |> String.trim() |> String.replace(~r/\s+/, " ")
   end
 end
