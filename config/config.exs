@@ -8,7 +8,6 @@
 # configurations or dependencies per app, it is best to
 # move said applications out of the umbrella.
 import Config
-
 # Sample configuration:
 #
 #     config :logger, :console,
@@ -16,3 +15,5 @@ import Config
 #       format: "$date $time [$level] $metadata$message\n",
 #       metadata: [:user_id]
 #
+
+import_config "#{config_env()}.exs"

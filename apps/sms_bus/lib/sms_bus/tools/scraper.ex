@@ -1,4 +1,6 @@
 defmodule SmsBus.Tools.Scraper do
+  @behaviour SmsBus.Tools.Scraper.Behaviour
+
   use Retry.Annotation
 
   @timeout 1000
@@ -13,8 +15,6 @@ defmodule SmsBus.Tools.Scraper do
     {"User-Agent",
      'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.106 Safari/537.36'}
   ]
-
-  @callback get_next_arrivals_by(stop_id :: binary()) :: {:ok, binary()} | {:error, binary()}
   def get_next_arrivals_by(stop_id) do
     get_cookie()
     |> get_next_arrivals(stop_id)
