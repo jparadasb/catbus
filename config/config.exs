@@ -16,4 +16,6 @@ import Config
 #       metadata: [:user_id]
 #
 
+config :sms_bus, scraper: SmsBus.Tools.Scraper
+
 import_config "#{config_env()}.exs"

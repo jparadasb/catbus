@@ -9,7 +9,6 @@ defmodule SmsBusTest do
   test "get_next_arrivals_by should return and array with routes" do
     SmsBus.Tools.Scraper.Mock
     |> expect(:get_next_arrivals_by, fn _ ->
-      IO.inspect(File.cwd())
       {:ok, File.read!("test/fixtures/response_full.html")}
     end)
 
