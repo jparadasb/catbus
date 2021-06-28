@@ -6,6 +6,27 @@ defmodule SmsBusTest do
 
   setup :verify_on_exit!
 
+  test "get_next_arrivals_by when service response with just one route" do
+    SmsBus.Tools.Scraper.Mock
+    |> expect(:get_next_arrivals_by, fn _ ->
+      {:ok, File.read!("test/fixtures/response_one_service.html")}
+    end)
+
+    assert SmsBus.next_arrivals_by_stop_id("PE513") == [
+             %Route{
+               error_message: "",
+               service_number: "E06",
+               next_arrivals: [
+                 %NextArrival{
+                   number_plate: "FLXY-40",
+                   arrival_time: "Menos de 3 min.",
+                   distance: "1076 mts."
+                 }
+               ]
+             }
+           ]
+  end
+
   test "get_next_arrivals_by should return and array with routes" do
     SmsBus.Tools.Scraper.Mock
     |> expect(:get_next_arrivals_by, fn _ ->
