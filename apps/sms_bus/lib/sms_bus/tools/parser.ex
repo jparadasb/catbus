@@ -19,7 +19,7 @@ defmodule SmsBus.Tools.Parser do
          error_routes <- get_routes_with_errors_from_nodes(document) do
       next_arrivals
       |> Enum.concat(error_routes)
-      |> Enum.sort_by(&{byte_size(&1.service_number), String.first(&1.service_number)})
+      |> Enum.sort_by(&{byte_size(&1.error_message), byte_size(&1.service_number)})
     end
   end
 

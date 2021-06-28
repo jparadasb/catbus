@@ -122,6 +122,6 @@ defmodule SmsBusTest do
                  ]
                }
              ]
-             |> Enum.sort_by(&{byte_size(&1.service_number), String.first(&1.service_number)})
+             |> Enum.sort_by(&{byte_size(&1.error_message), byte_size(&1.service_number)})
   end
 end
