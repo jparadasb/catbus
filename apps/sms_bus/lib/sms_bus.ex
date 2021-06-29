@@ -4,6 +4,5 @@ defmodule SmsBus do
   def next_arrivals_by_stop_id(stop_id) do
     @scraper.get_next_arrivals_by(stop_id)
     |> SmsBus.Tools.Parser.to_struct()
-    |> IO.inspect()
   end
 end

@@ -1,33 +1,59 @@
 defmodule SmsBusTest do
-  alias SmsBus.Models.{NextArrival, Route}
+  alias SmsBus.Models.{NextArrival, Route, Stop}
   use ExUnit.Case
   import Mox
   doctest SmsBus
 
   setup :verify_on_exit!
 
-  test "get_next_arrivals_by when service response with just one route" do
+  test "CASE 3: stop out operation" do
+    SmsBus.Tools.Scraper.Mock
+    |> expect(:get_next_arrivals_by, fn _ ->
+      {:ok, File.read!("test/fixtures/case_3.html")}
+    end)
+
+    assert SmsBus.next_arrivals_by_stop_id("PE513") == %Stop{
+             routes: [],
+             name: "Paradero: Palena / esq. Orompello",
+             code: "PE513",
+             request_time: "21:01 hrs",
+             status: :inactive,
+             status_message: "Fuera de horario de operacion para este paradero",
+             routes: [
+               %SmsBus.Models.Route{
+                 error_message: "Fuera de horario de operacion para este paradero",
+                 service_number: "E06"
+               }
+             ]
+           }
+  end
+
+  test "CASE 2: get_next_arrivals_by when service response with just one route" do
     SmsBus.Tools.Scraper.Mock
     |> expect(:get_next_arrivals_by, fn _ ->
       {:ok, File.read!("test/fixtures/response_one_service.html")}
     end)
 
-    assert SmsBus.next_arrivals_by_stop_id("PE513") == [
-             %Route{
-               error_message: "",
-               service_number: "E06",
-               next_arrivals: [
-                 %NextArrival{
-                   number_plate: "FLXY-40",
-                   arrival_time: "Menos de 3 min.",
-                   distance: "1076 mts."
-                 }
-               ]
-             }
-           ]
+    assert SmsBus.next_arrivals_by_stop_id("PE513") == %Stop{
+             routes: [
+               %Route{
+                 service_number: "E06",
+                 next_arrivals: [
+                   %NextArrival{
+                     number_plate: "FLXY-40",
+                     arrival_time: "Menos de 3 min.",
+                     distance: "1076 mts."
+                   }
+                 ]
+               }
+             ],
+             name: "Paradero: Palena / esq. Orompello",
+             code: "PE513",
+             request_time: "17:50 hrs"
+           }
   end
 
-  test "get_next_arrivals_by should return and array with routes" do
+  test "CASE 1: get_next_arrivals_by should return and array with routes" do
     SmsBus.Tools.Scraper.Mock
     |> expect(:get_next_arrivals_by, fn _ ->
       {:ok, File.read!("test/fixtures/response_full.html")}
