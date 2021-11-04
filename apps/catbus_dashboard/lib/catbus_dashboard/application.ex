@@ -9,7 +9,7 @@ defmodule CatbusDashboard.Application do
   def start(_type, _args) do
     children = [
       # Start the Ecto repository
-      CatbusDashboard.Repo,
+      # CatbusDashboard.Repo,
       # Start the Telemetry supervisor
       CatbusDashboardWeb.Telemetry,
       # Start the PubSub system
